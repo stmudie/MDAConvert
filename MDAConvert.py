@@ -29,7 +29,7 @@ class MDAConvert():
         self.dataFullPath = '%s%s/%s/' % (self.dataMount,'/'.join(char_value.split('/')[-5:-2]),self.dataSubDirectory)
     
     def onScanDSTATE(self, pvname, value, **kwargs):
-        print 'DSTATE'
+        
         if value  == 7:
             thread=Thread(target=self.convertMDA)
             thread.daemon = True
@@ -63,7 +63,8 @@ class MDAConvert():
 
         epn = self.dataFullPath.split('/')[-3]
         try:
-            self.redis.rpush('MDA:%s:%s' % (epn,os.path.splitext(os.path.basename(datFileName))[0]),self.datFileName)
+            self.redis.rpush('MDA:%s' % (epn,),datFileName)
+            self.redis.publish('MDA:NewFile',datFileName)
         except redis.ConnectionError:
             print 'Error connecting to redis database'
         
